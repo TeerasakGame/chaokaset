@@ -25,7 +25,9 @@ class Welcome extends CI_Controller {
 		//$name = $this->input->post('name');
 		$this->load->model('m_auth','auth');
 		$data = $this->auth->test();
-		var_dump($data);
+		echo '<pre>';
+		print_r($data);
+		echo '</pre>';
 		//echo $name;
 
 	}
