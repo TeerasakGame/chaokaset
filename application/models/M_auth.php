@@ -21,6 +21,11 @@
 			$this->db->insert('contacts', $data);
 		}
 
+		function addProfile($id,$data){
+			$this->db->where('use_id',$id) ;
+	    $this->db->update('users', $data);
+		}
+
 		function checkemail($email){
 			$sql = "SELECT * FROM users WHERE use_email = ?  LIMIT 1";
 			$query = $this->db->query($sql, array($email));
