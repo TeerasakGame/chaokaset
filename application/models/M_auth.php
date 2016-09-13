@@ -31,5 +31,6 @@
 			$query = $this->db->query($sql, array($email));
 			return $query->result_array();
 		}
+
 	}
 ?>

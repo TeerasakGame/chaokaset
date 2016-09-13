@@ -5,8 +5,12 @@ class Services extends CI_Controller {
 
   function __construct(){
     parent::__construct();
-    //-- load model M_auth
+    //-- load model
     $this->load->model('m_auth','auth');
+    $this->load->model('m_account','account');
+    $this->load->model('m_problem','problem');
+    //-- lode Libraries encrypt
+    $this->load->library('encrypt');
   }
 
 	public function index()
@@ -23,8 +27,6 @@ class Services extends CI_Controller {
     data to return is status,data[name,user_id,email]
   */
   public function register(){
-    //-- lode Libraries encrypt
-    $this->load->library('encrypt');
     //-- input data
     $name = $this->input->post('name');
     $lname = $this->input->post('lname');
@@ -33,11 +35,10 @@ class Services extends CI_Controller {
     $tel = $this->input->post('tel');
     $acter = $this->input->post('acter');
     $pic = $this->input->post('pic');
-    //echo $pic;
 
     //-- encode password
     $password_endcode = $this->encrypt->encode($password);
-    //$password = $this->encrypt->decode($password_endcode);
+
     //-- check data
     if($name == NULL || $lname == NULL || $email == NULL || $password == NULL || $tel == NULL || $acter == NULL){
       $json_error = array('status' => FALSE);
@@ -222,6 +223,49 @@ class Services extends CI_Controller {
 
     }
   }//loginfacebook
+
+  public function showaccaccount(){
+    $id = $this->input->post('idcrop');
+    $data = $this->account->showaccaccount($id);
+    $total = $this->account->totalaccount($id);
+    if($data == NULL){
+      $json1 = array(
+                'status' => FALSE ,
+              );
+      echo json_encode($json1);
+    }else{
+      $json = array(
+                'status' => TRUE ,
+                'data' =>  array(
+                            'all' => $data,
+                            'total' => $total,
+                           ) ,
+              );
+      echo json_encode($json);
+    }
+  }//addaccaccount
+
+  public function showproblem(){
+    $id = $this->input->post('idcrop');
+    $data = $this->problem->showproblem($id);
+    if($data == NULL){
+      $json1 = array(
+                'status' => FALSE ,
+              );
+      echo json_encode($json1);
+    }else{
+      $json = array(
+                'status' => TRUE ,
+                'data' =>  $data,
+              );
+      echo json_encode($json);
+    }
+  }//addaccaccount
+
+  public function addaccaccount(){
+    $id = $this->input->post('idUser');
+
+  }//addaccaccount
 
 
 
