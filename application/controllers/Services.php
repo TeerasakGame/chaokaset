@@ -50,6 +50,7 @@ $pic = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
       echo json_encode($json_error);
     }else {
       //-- set data to array
+
       $data = array(
                 'use_name' => $name,
                 'use_lname' => $lname,
@@ -61,13 +62,15 @@ $pic = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
 
       //-- call model insert data funtion is return id user insert now!!
       $id_user = $this->auth->register($data);
-      //-- add pic profile
+
       $name_pic = "/upload/profile/profile_".$id_user.".jpg";
-      $path = $_SERVER["DOCUMENT_ROOT"]."/chaokaset".$name_pic;
+      //-- add pic profile
+      //$name_pic = "/upload/profile/profile_".$id_user.".jpg";
+      //$path = $_SERVER["DOCUMENT_ROOT"]."/chaokaset".$name_pic;
       //$path = $name_pic;
-      $data_pic = explode(',',$pic);
+      //$data_pic = explode(',',$pic);
       //$decode = base64_decode($pic);
-      file_put_contents($path,base64_decode($data_pic[1]));
+      //file_put_contents($path,base64_decode($data_pic[1]));
       //$a = "upload/profile/profile_".$id_user.".jpg";
     //  copy(base64_decode($data_pic[1]),$a);
       $data_pic = array('use_pic' => $name_pic, );
@@ -291,10 +294,11 @@ $pic = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
               );
       echo json_encode($json2);
     }*/
-    print_r($_FILES);
+    //print_r($_FILES);
+    header('Access-Control-Allow-Origin: *');
     $tmp_name = $_FILES["file"]["tmp_name"];
     //$name = $_FILES["file"]["name"];
-    $path = $_SERVER["DOCUMENT_ROOT"].'/chaokaset/upload/profile/1111.jpg';
+    $path = $_SERVER["DOCUMENT_ROOT"].'/chaokaset/upload/profile/1234.jpg';
     move_uploaded_file($tmp_name, $path);
 
 
