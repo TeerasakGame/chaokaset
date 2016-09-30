@@ -237,6 +237,22 @@ class Services extends CI_Controller {
     $id = $this->input->post('crop_id');
     $data = $this->account->showaccaccount($id);
     $total = $this->account->totalaccount($id);
+    $val = [];
+    foreach ($data as $key) {
+      $date_name = $this->changdate($key['cropa_date']);
+      $value = array(
+                'cropa_id' => $key['cropa_id'],
+                'cropa_name' => $key['cropa_name'],
+                'cropa_amount' => $key['cropa_amount'],
+                'date_name' => $date_name,
+                'cropa_type' => $key['cropa_type'],
+               );
+      array_push($val,$value);
+    }
+    $total = array(
+              'plus' => $total[0]['plus'] ,
+              'minus'=> $total[0]['minus'] ,
+             );
     if($data == NULL){
       $json1 = array(
                 'status' => FALSE ,
@@ -246,7 +262,7 @@ class Services extends CI_Controller {
       $json = array(
                 'status' => TRUE ,
                 'data' =>  array(
-                            'all' => $data,
+                            'all' => $val,
                             'total' => $total,
                            ) ,
               );
@@ -257,6 +273,20 @@ class Services extends CI_Controller {
   public function showproblem(){
     $id = $this->input->post('crop_id');
     $data = $this->problem->showproblem($id);
+    $val = [];
+    foreach ($data as $key) {
+      $date_name = $this->changdate($key['cropp_date']);
+      $value = array(
+                'cropp_id' => $key['cropp_id'],
+                'cropp_name' => $key['cropp_name'],
+                'cropp_detail' => $key['cropp_detail'],
+                'count_ans' => $key['count_ans'],
+                'date_name' => $date_name,
+               );
+      array_push($val,$value);
+    }
+
+
     if($data == NULL){
       $json1 = array(
                 'status' => FALSE ,
@@ -265,7 +295,7 @@ class Services extends CI_Controller {
     }else{
       $json = array(
                 'status' => TRUE ,
-                'data' =>  $data,
+                'data' =>  $val,
               );
       echo json_encode($json);
     }
@@ -277,8 +307,32 @@ class Services extends CI_Controller {
   }//addaccaccount
 
   public function showcrop(){
+
     $id = $this->input->post('crop_id');
+    //$id = 1;
     $data = $this->crop->showcropbyid($id);
+
+    $start_name = $this->changdate($data[0]['crop_start']);
+    $end_name = $this->changdate($data[0]['crop_end']);
+    $lacation = $this->get_name_latlng($data[0]['crop_lat'],$data[0]['crop_long']);
+    $val = array(
+            'start_name' => $start_name,
+            'end_name' => $end_name,
+            'crop_id' => $data[0]['crop_id'],
+            'crop_name' => $data[0]['crop_name'],
+            'plat_name' => $data[0]['plat_name'],
+            'seed_name' => $data[0]['seed_name'],
+            'plat_name' => $data[0]['plat_name'],
+            'crop_rai' => $data[0]['crop_rai'],
+            'crop_nan' => $data[0]['crop_nan'],
+            'crop_wa' => $data[0]['crop_wa'],
+            'location' => $lacation,
+            'pla_name' => $data[0]['pla_name'],
+            'pla_time' => $data[0]['pla_time'],
+           );
+      //echo "<pre>";
+    //  print_r($val);
+
     if($data == NULL){
       $json1 = array(
                 'status' => FALSE ,
@@ -287,11 +341,100 @@ class Services extends CI_Controller {
     }else{
       $json = array(
                 'status' => TRUE ,
-                'data' =>  $data,
+                'data' =>  $val,
               );
       echo json_encode($json);
     }
   }
+  public function changdate($date){
+    $val = explode(' ',$date);
+    $val_date = explode('-',$val[0]);
+    $y = $val_date[0] + 543;
+
+    switch ($val_date[1]) {
+      case '01':
+        $m = "มกราคม";
+        break;
+        case '02':
+          $m = "กุมภาพันธ์";
+          break;
+        case '03':
+          $m = "มีนาคม";
+          break;
+        case '04':
+          $m = "เมษายน";
+          break;
+        case '05':
+          $m = "พฤษภาคม";
+          break;
+        case '06':
+          $m = "มิถุนายน";
+          break;
+        case '07':
+          $m = "กรกฏาคม";
+          break;
+        case '08':
+          $m = "สิงหาคม";
+          break;
+        case '09':
+          $m = "กันยายน";
+          break;
+        case '10':
+          $m = "ตุลาคม";
+          break;
+        case '11':
+          $m = "พฤษจิกายน";
+          break;
+        case '12':
+          $m = "ธันวาคม";
+          break;
+    }
+    $date = $val_date[2]." ".$m." ".$y;
+    return $date;
+  }
+
+  public function get_name_latlng($lat,$lng){
+		//url gat data from google API
+		$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.$lat.'%2C'.$lng.'&language=th';
+		//get data Json return form google map Api
+    //echo $url;
+		$data = json_decode(file_get_contents($url),true);
+  //  var_dump($data);
+
+		foreach ($data['results'][0]['address_components'] as $key) {
+
+			if($key['types'][0] == 'locality'){
+				$name_tambon = $key['long_name'];
+				//echo $name_tambon.'<';
+			}
+			if($key['types'][0] == 'sublocality_level_2'){
+				$name_tambon = $key['long_name'];
+				//echo $name_tambon.'<';
+			}
+			if($key['types'][0] == 'administrative_area_level_2'){
+				$name_amphoe = $key['long_name'];
+				//echo $name_amphoe.'<';
+			}
+			if($key['types'][0] == 'sublocality_level_1'){
+				$name_amphoe = $key['long_name'];
+				//echo $name_amphoe.'<';
+			}
+			if($key['types'][0] == 'administrative_area_level_1'){
+				$name_changwat = $key['long_name'];
+				//echo $name_changwat.'<';
+			}
+		}
+		$full_name = $name_tambon." ".$name_amphoe." ".$name_changwat;
+		//var_dump($full_name);die();
+		$name = array(
+			'tambon' => $name_tambon,
+			'amphoe' => $name_amphoe,
+			'changwat' => $name_changwat,
+			'full_name' => $full_name,
+			);
+
+		return $name;
+	}
 
   public function file(){
     header('Access-Control-Allow-Origin: *');
@@ -318,8 +461,73 @@ class Services extends CI_Controller {
     }
   }
 
+  public function getplant(){
+    $plant = $this->crop->getplant();
+    $data = [];
+    //array_push(,);
+    foreach ($plant as $key) {
+      $seed = $this->crop->getseed($key['plat_id']);
+      $val = array(
+              'plat_name' => $key['plat_name'],
+              'option' => $seed,
+             );
+      array_push($data,$val);
+    }
+    echo json_encode($data);
+    //echo count($data);
+  }
+
+  public function getplant_select(){
+    $plant = $this->crop->getplant();
+    echo json_encode($plant);
+    //echo count($data);
+  }
+
+  public function getseed_select($id){
+    $seed = $this->crop->getseed($id);
+    echo json_encode($seed);
+    //echo count($data);
+  }
+
+  public function getplan_select($id){
+    $plan = $this->crop->getplan($id);
+    echo json_encode($plan);
+    //echo count($data);
+  }
+
+  public function addcrop(){
+    $name = $this->input->post('name');
+    $id_user = $this->input->post('id_user');
+    $seed = $this->input->post('seed');
+    $plan = $this->input->post('plan');
+    $rai = $this->input->post('rai');
+    $nan = $this->input->post('nan');
+    $wa = $this->input->post('wa');
+    $lat = $this->input->post('lat');
+    $long = $this->input->post('long');
+
+    $data = array(
+              'crop_name' => $name,
+              'crop_lat' => $lat,
+              'crop_long' => $long,
+              'crop_rai' => $rai,
+              'crop_nan' => $nan,
+              'crop_wa' => $wa,
+              'crop_wa' => $wa,
+              'crop_status' => '1',
+              'use_id' => $id_user,
+              'pla_id' => $plan,
+              'seed_id' => $seed,
+            );
+
+    $this->crop->addCrop($data);
+
+    $json = array(
+              'status' => TRUE ,
+              );
+    echo json_encode($json);
+
+  }
 
 
-
-
-}
+}//class
