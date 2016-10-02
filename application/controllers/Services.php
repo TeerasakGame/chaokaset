@@ -249,9 +249,15 @@ class Services extends CI_Controller {
                );
       array_push($val,$value);
     }
+    if($total[0]['plus']>=$total[0]['minus']){
+      $ans = 'plus';
+    }else{
+      $ans = 'minus';
+    }
     $total = array(
               'plus' => $total[0]['plus'] ,
               'minus'=> $total[0]['minus'] ,
+              'ans' =>$ans,
              );
     if($data == NULL){
       $json1 = array(
@@ -303,7 +309,27 @@ class Services extends CI_Controller {
 
   public function addaccaccount(){
     $id = $this->input->post('crop_id');
-
+    $num = $this->input->post('num');
+    $detail = $this->input->post('detail');
+    $type = $this->input->post('type');
+    $status = $this->input->post('status');
+    if($status == "true"){
+      $status = "1";
+    }else{
+      $status = "0";
+    }
+    $data = array(
+              'cropa_name' => $detail,
+              'cropa_type' => $type,
+              'cropa_amount' => $num,
+              'cropa_status' => $status ,
+              'crop_id'=> $id ,
+            );
+    $this->crop->addaccaccount($data);
+    $json = array(
+              'status' => TRUE ,
+              );
+    echo json_encode($json);
   }//addaccaccount
 
   public function showcrop(){
@@ -520,12 +546,36 @@ class Services extends CI_Controller {
               'seed_id' => $seed,
             );
 
-    $this->crop->addCrop($data);
+    $crop_id = $this->crop->addCrop($data);
 
+    $data_plan = $this->crop->getplanid($plan);
+
+    foreach ($data_plan as $key) {
+      $val = array(
+              'cropd_name' => $key['ptem_name'],
+              'cropd_start' => $key['ptem_start'],
+              'cropd_end' => $key['ptem_end'],
+              'cropd_detail' => $key['ptem_detail'],
+              'cropd_status_plan' => '1',
+              'cropd_report_status' => '0',
+              'cropd_report_date' => NULL,
+              'crop_id' => $crop_id,
+              'tgui_id' => $key['tgui_id'],
+            );
+      $this->crop->addCropDetail($val);
+    }
     $json = array(
               'status' => TRUE ,
               );
     echo json_encode($json);
+
+  }
+
+  public function deleteaccount(){
+    $id = $this->input->post('cropa_id');
+    $this->crop->deleteaccount($id);
+  }
+  public function showplan(){
 
   }
 
